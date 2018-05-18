@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"unicode"
 )
 
 func main() {
@@ -60,25 +61,48 @@ func main() {
 	fmt.Println(spaces + `        ||     ||   `)
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 func splitIntoLines(s string) (lines []string, maxLineW int) {
 	const max = 80 - 6
 	runes := []rune(s)
+	n := 0
+	for _, r := range runes {
+		if r == '\n' || unicode.IsGraphic(r) {
+			runes[n] = r
+			n++
+		}
+	}
+	runes = runes[:n]
 	var runeLines [][]rune
 	runeLines = append(runeLines, runes)
-	for {
+	wasSplit := true
+	for wasSplit {
 		n := len(runeLines) - 1
-		if len(runeLines[n]) <= max {
-			break
-		}
-		splitLeft, splitRight := max, max
-		for i := max - 1; i >= 1; i-- {
-			if runeLines[n][i] == ' ' {
-				splitLeft, splitRight = i+1, i
-				break
+		line := runeLines[n]
+		wasSplit = false
+		lineBreak := strings.Index(string(line[:min(len(line), max)]), "\n")
+		if lineBreak >= 0 {
+			runeLines = append(runeLines, line[lineBreak+1:])
+			runeLines[n] = line[:lineBreak]
+			wasSplit = true
+		} else if len(line) > max {
+			splitLeft, splitRight := max, max
+			for i := max - 1; i >= 1; i-- {
+				if line[i] == ' ' {
+					splitLeft, splitRight = i+1, i
+					break
+				}
 			}
+			runeLines = append(runeLines, line[splitLeft:])
+			runeLines[n] = line[:splitRight]
+			wasSplit = true
 		}
-		runeLines = append(runeLines, runeLines[n][splitLeft:])
-		runeLines[n] = runeLines[n][:splitRight]
 	}
 	for _, runeLine := range runeLines {
 		if len(runeLine) > maxLineW {

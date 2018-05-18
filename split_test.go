@@ -26,12 +26,30 @@ func TestSplit(t *testing.T) {
 			},
 			71,
 		},
+		{
+			"Text with line breaks\n\nis split there.\n",
+			[]string{
+				"Text with line breaks",
+				"",
+				"is split there.",
+				"",
+			},
+			len("Text with line breaks"),
+		},
+		{
+			"Windows\r\nline breaks...",
+			[]string{
+				"Windows",
+				"line breaks...",
+			},
+			len("line breaks..."),
+		},
 	}
 
 	for _, test := range tests {
 		lines, width := splitIntoLines(test.have)
 		if !stringsEqual(lines, test.lines) || width != test.width {
-			t.Error(width, lines)
+			t.Errorf("%d %#v", width, lines)
 		}
 	}
 }
