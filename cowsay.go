@@ -73,6 +73,9 @@ func splitIntoLines(s string) (lines []string, maxLineW int) {
 	runes := []rune(s)
 	n := 0
 	for _, r := range runes {
+		if r == '\t' {
+			r = ' '
+		}
 		if r == '\n' || unicode.IsGraphic(r) {
 			runes[n] = r
 			n++

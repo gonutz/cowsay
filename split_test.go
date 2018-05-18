@@ -44,6 +44,13 @@ func TestSplit(t *testing.T) {
 			},
 			len("line breaks..."),
 		},
+		{
+			"Print \ttabs\t as spaces",
+			[]string{
+				"Print  tabs  as spaces",
+			},
+			len("Print  tabs  as spaces"),
+		},
 	}
 
 	for _, test := range tests {
